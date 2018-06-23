@@ -1,6 +1,7 @@
 # JSON God v2
 
-![version 2.0.0-beta](https://img.shields.io/badge/version-2.0.0--beta-blue.svg)
+![Pub](https://img.shields.io/pub/v/json_god.svg)
+[![build status](https://travis-ci.org/thosakwe/json_god.svg)](https://travis-ci.org/thosakwe/json_god)
 
 The ***new and improved*** definitive solution for JSON in Dart.
 
@@ -15,23 +16,7 @@ It is recommended to import the library under an alias, i.e., `god`.
 
 ```dart
 import 'package:json_god/json_god.dart' as god;
-
-// Set .debug to true to print VERY VERBOSE debug output.
-// god.debug = true;
 ```
-
-## Dart2JS Compatibility
-**IMPORTANT - Reflection through dart:mirrors is not yet perfect in Dart2JS. Make sure
-to add a `@MirrorsUsed()` annotation to any classes you want to serialize/deserialize.**
-
-```dart
-library app;
-
-@MirrorsUsed(targets: 'app')
-import 'dart:mirrors';
-```
-
-`@MirrorsUsed` documentation can be found [here](https://api.dartlang.org/1.14.2/dart-mirrors/MirrorsUsed-class.html).
 
 ## Serializing JSON
 
@@ -116,17 +101,6 @@ HasAnInt invalid = god.deserialize('["some invalid input"]', HasAnInt);
 // Throws an error
 ```
 
-# Validation
-You can also enforce validation rules, thanks to the `json_schema` package.
-Both `serialize` and `deserialize` support a named parameter, `schema`. Alternatively,
-use the `WithSchema` or `WithSchemaUrl` annotations on your classes.
-
-```dart
-@WithSchema(const {})
-
-@WithSchemaUrl("url")
-```
-
 An exception will be thrown if validation fails.
 
 # Thank you for using JSON God
@@ -136,4 +110,4 @@ Thank you for using this library. I hope you like it.
 Feel free to follow me on Twitter: 
 [@thosakwe](http://twitter.com/thosakwe)
 
-Or, check out [my blog](http://blog.thosakwe.com)
+Or, check out [my blog](https://thosakwe.com)
