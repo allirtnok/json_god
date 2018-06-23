@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 import 'shared.dart';
 
 main() {
-  god.debug = true;
+  god.logger.onRecord.listen(printRecord);
 
   group('deserialization', () {
     test('deserialize primitives', testDeserializationOfPrimitives);
@@ -65,7 +65,7 @@ testDeserializationOfListsAsWellAsViaReflection() {
   ''';
 
   List<SampleClass> list =
-      god.deserialize(json, outputType: new List<SampleClass>().runtimeType);
+      god.deserialize(json, outputType: List).cast<SampleClass>();
   SampleClass first = list[0];
   SampleClass second = list[1];
 

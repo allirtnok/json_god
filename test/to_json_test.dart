@@ -1,12 +1,14 @@
 import 'package:json_god/json_god.dart' as god;
 import 'package:test/test.dart';
+import 'shared.dart';
 
 main() {
+  god.logger.onRecord.listen(printRecord);
+
   test('fromJson', () {
-    god.debug = true;
     Foo foo = god.deserialize('{"bar":"baz"}', outputType: Foo);
 
-    expect(foo, new isInstanceOf<Foo>());
+    expect(foo, const TypeMatcher<Foo>());
     expect(foo.text, equals('baz'));
   });
 

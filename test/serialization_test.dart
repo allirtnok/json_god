@@ -1,10 +1,10 @@
-import 'dart:convert' show JSON;
+import 'package:dart2_constant/convert.dart';
 import 'package:json_god/json_god.dart' as god;
 import 'package:test/test.dart';
 import 'shared.dart';
 
 main() {
-  god.debug = true;
+  god.logger.onRecord.listen(printRecord);
 
   group('serialization', () {
     test('serialize primitives', testSerializationOfPrimitives);
@@ -32,18 +32,18 @@ testSerializationOfPrimitives() {
 
 testSerializationOfDates() {
   DateTime date = new DateTime.now();
-  String json = god.serialize({'date': date});
+  String s = god.serialize({'date': date});
 
-  print(json);
+  print(s);
 
-  Map deserialized = JSON.decode(json);
+  Map deserialized = json.decode(s);
   expect(deserialized['date'], equals(date.toIso8601String()));
 }
 
 testSerializationOfMaps() {
-  Map simple = JSON.decode(god.serialize(
+  Map simple = json.decode(god.serialize(
       {'hello': 'world', 'one': 1, 'class': new SampleClass('world')}));
-  Map nested = JSON.decode(god.serialize({
+  Map nested = json.decode(god.serialize({
     'foo': {
       'bar': 'baz',
       'funny': {'how': 'life', 'seems': 2, 'hate': 'us sometimes'}
@@ -67,10 +67,10 @@ testSerializationOfLists() {
     {"num": 3, "four": new SampleClass('five')},
     new SampleClass('six')..nested.add(new SampleNestedClass('seven'))
   ];
-  String json = god.serialize(pandorasBox);
-  print(json);
+  String s = god.serialize(pandorasBox);
+  print(s);
 
-  List deserialized = JSON.decode(json);
+  List deserialized = json.decode(s);
 
   expect(deserialized is List, equals(true));
   expect(deserialized.length, equals(4));
@@ -95,10 +95,10 @@ testSerializationViaReflection() {
     sample.nested.add(new SampleNestedClass('baz'));
   }
 
-  String json = god.serialize(sample);
-  print(json);
+  String s = god.serialize(sample);
+  print(s);
 
-  Map deserialized = JSON.decode(json);
+  Map deserialized = json.decode(s);
   expect(deserialized['hello'], equals('world'));
   expect(deserialized['nested'] is List, equals(true));
   expect(deserialized['nested'].length == 3, equals(true));
@@ -111,10 +111,10 @@ testSerializationWithSchemaValidation() async {
   BabelRc babelRc = new BabelRc(
       presets: ['es2015', 'stage-0'], plugins: ['add-module-exports']);
 
-  String json = god.serialize(babelRc);
-  print(json);
+  String s = god.serialize(babelRc);
+  print(s);
 
-  Map deserialized = JSON.decode(json);
+  Map deserialized = json.decode(s);
 
   expect(deserialized['presets'] is List, equals(true));
   expect(deserialized['presets'].length, equals(2));
@@ -124,7 +124,7 @@ testSerializationWithSchemaValidation() async {
   expect(deserialized['plugins'].length, equals(1));
   expect(deserialized['plugins'][0], equals('add-module-exports'));
 
-  Map babelRc2 = {'presets': 'Hello, world!'};
+  //Map babelRc2 = {'presets': 'Hello, world!'};
 
   String json2 = god.serialize(babelRc);
   print(json2);

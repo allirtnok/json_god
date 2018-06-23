@@ -1,4 +1,12 @@
+import 'package:logging/logging.dart';
 import 'package:json_god/json_god.dart';
+import 'package:stack_trace/stack_trace.dart';
+
+void printRecord(LogRecord rec) {
+  print(rec);
+  if (rec.error != null) print(rec.error);
+  if (rec.stackTrace != null) print(new Chain.forTrace(rec.stackTrace).terse);
+}
 
 class SampleNestedClass {
   String bar;
