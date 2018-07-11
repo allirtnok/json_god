@@ -10,6 +10,8 @@ main() {
 
     test('deserialize maps', testDeserializationOfMaps);
 
+    test('deserialize maps + reflection', testDeserializationOfMapsWithReflection);
+
     test('deserialize lists + reflection',
         testDeserializationOfListsAsWellAsViaReflection);
 
@@ -44,6 +46,18 @@ testDeserializationOfMaps() {
   expect(nested['foo']['funny']['hate'], equals('us sometimes'));
 }
 
+class Pokedex {
+  Map<String, int> pokemon;
+}
+
+testDeserializationOfMapsWithReflection() {
+  var s = '{"pokemon": {"Bulbasaur": 1, "Deoxys": 382}}';
+  var pokedex = god.deserialize(s, outputType: Pokedex) as Pokedex;
+  expect(pokedex.pokemon, hasLength(2));
+  expect(pokedex.pokemon['Bulbasaur'], 1);
+  expect(pokedex.pokemon['Deoxys'], 382);
+}
+
 testDeserializationOfListsAsWellAsViaReflection() {
   String json = '''[
     {
@@ -64,8 +78,7 @@ testDeserializationOfListsAsWellAsViaReflection() {
   ]
   ''';
 
-  List<SampleClass> list =
-      god.deserialize(json, outputType: List).cast<SampleClass>();
+  var list = god.deserialize(json, outputType: (<SampleClass>[]).runtimeType) as List<SampleClass>;
   SampleClass first = list[0];
   SampleClass second = list[1];
 
@@ -88,6 +101,7 @@ testDeserializationWithSchemaValidation() async {
 
   BabelRc deserialized = god.deserialize(babelRcJson, outputType: BabelRc);
 
+  print(deserialized.presets.runtimeType);
   expect(deserialized.presets is List, equals(true));
   expect(deserialized.presets.length, equals(2));
   expect(deserialized.presets[0], equals('es2015'));

@@ -8,7 +8,7 @@ main() {
   test('fromJson', () {
     Foo foo = god.deserialize('{"bar":"baz"}', outputType: Foo);
 
-    expect(foo, const TypeMatcher<Foo>());
+    expect(foo is Foo, true);
     expect(foo.text, equals('baz'));
   });
 
@@ -26,7 +26,7 @@ class Foo {
 
   Foo({this.text});
 
-  factory Foo.fromJson(Map json) => new Foo(text: json['bar']);
+  factory Foo.fromJson(Map json) => new Foo(text: json['bar'].toString());
 
   Map toJson() => {'bar': text, 'foo': foo};
 }

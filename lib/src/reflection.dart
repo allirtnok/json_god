@@ -76,15 +76,19 @@ deserialize(value, Type outputType, Deserializer deserializer,
       }
 
       if (typeArguments.isEmpty) return it.toList();
-      logger.info('Casting list elements to ${typeArguments[0].reflectedType}');
-      var inv = new Invocation.genericMethod(#cast,
-          [typeArguments[0].reflectedType], []);
-      logger.info('INVOCATION OF ${inv.memberName} with type args: ${inv
-          .typeArguments}');
-      ClassMirror a;
-      var output = reflect(it.toList()).delegate(inv);
-      logger.info('Casted list type: ${output.runtimeType}');
-      return output;
+      logger.info('Casting list elements to ${typeArguments[0]
+          .reflectedType} via List.from');
+
+      var mirror = reflectType(List, [typeArguments[0].reflectedType]);
+
+      if (mirror is ClassMirror) {
+        var output = mirror.newInstance(#from, [it]).reflectee;
+        logger.info('Casted list type: ${output.runtimeType}');
+        return output;
+      } else {
+        throw new ArgumentError(
+            '${typeArguments[0].reflectedType} is not a class.');
+      }
     } else if (value is Map)
       return _deserializeFromJsonByReflection(value, deserializer, outputType);
     else
@@ -101,6 +105,10 @@ _deserializeFromJsonByReflection(
     [@deprecated bool debug = false]) {
   // Check for fromJson
   var typeMirror = reflectType(outputType);
+
+  if (typeMirror is! ClassMirror) {
+    throw new ArgumentError('$outputType is not a class.');
+  }
 
   var type = typeMirror as ClassMirror;
   var fromJson =
@@ -122,40 +130,64 @@ _deserializeFromJsonByReflection(
 
   ClassMirror classMirror = type;
   InstanceMirror instanceMirror = classMirror.newInstance(new Symbol(""), []);
-  data.keys.forEach((key) {
-    try {
-      logger.info("Now deserializing value for $key");
-      logger.info("data[\"$key\"] = ${data[key]}");
-      var deserializedValue = deserializer(data[key]);
 
-      logger.info("I want to set $key to the following ${deserializedValue
-          .runtimeType}: $deserializedValue");
-      // Get target type of getter
-      Symbol searchSymbol = new Symbol(key);
-      Symbol symbolForGetter =
-          classMirror.instanceMembers.keys.firstWhere((x) => x == searchSymbol);
-      Type requiredType =
-          classMirror.instanceMembers[symbolForGetter].returnType.reflectedType;
-      if (data[key].runtimeType != requiredType) {
-        if (debug) {
-          logger.info("Currently, $key is a ${data[key].runtimeType}.");
-          logger.info("However, $key must be a $requiredType.");
-        }
+  if (classMirror.isSubclassOf(reflectClass(Map))) {
+    var typeArguments = classMirror.typeArguments;
 
-        deserializedValue =
-            deserializer(deserializedValue, outputType: requiredType);
+    if (typeArguments.isEmpty ||
+        classMirror.typeArguments
+            .every((t) => t == currentMirrorSystem().dynamicType)) {
+      return data;
+    } else {
+      var mapType =
+          reflectType(Map, typeArguments.map((t) => t.reflectedType).toList())
+              as ClassMirror;
+      logger.info('Casting this map $data to Map of [$typeArguments]');
+      var output = mapType.newInstance(Symbol.empty, []).reflectee;
+
+      for (var key in data.keys) {
+        output[key] = data[key];
       }
 
-      logger.info(
-          "Final deserialized value for $key: $deserializedValue <${deserializedValue
-              .runtimeType}>");
-      instanceMirror.setField(new Symbol(key), deserializedValue);
-
-      logger.info("Success! $key has been set to $deserializedValue");
-    } catch (e, st) {
-      logger.severe('Could not set value for field $key.', e, st);
+      logger.info('Output: $output of type ${output.runtimeType}');
+      return output;
     }
-  });
+  } else {
+    data.keys.forEach((key) {
+      try {
+        logger.info("Now deserializing value for $key");
+        logger.info("data[\"$key\"] = ${data[key]}");
+        var deserializedValue = deserializer(data[key]);
+
+        logger.info("I want to set $key to the following ${deserializedValue
+            .runtimeType}: $deserializedValue");
+        // Get target type of getter
+        Symbol searchSymbol = new Symbol(key.toString());
+        Symbol symbolForGetter = classMirror.instanceMembers.keys
+            .firstWhere((x) => x == searchSymbol);
+        Type requiredType = classMirror
+            .instanceMembers[symbolForGetter].returnType.reflectedType;
+        if (data[key].runtimeType != requiredType) {
+          if (debug) {
+            logger.info("Currently, $key is a ${data[key].runtimeType}.");
+            logger.info("However, $key must be a $requiredType.");
+          }
+
+          deserializedValue =
+              deserializer(deserializedValue, outputType: requiredType);
+        }
+
+        logger.info(
+            "Final deserialized value for $key: $deserializedValue <${deserializedValue
+                .runtimeType}>");
+        instanceMirror.setField(new Symbol(key.toString()), deserializedValue);
+
+        logger.info("Success! $key has been set to $deserializedValue");
+      } catch (e, st) {
+        logger.severe('Could not set value for field $key.', e, st);
+      }
+    });
+  }
 
   return instanceMirror.reflectee;
 }

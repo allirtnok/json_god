@@ -4,13 +4,13 @@ part of json_god;
 ///
 /// You can also provide an output Type to attempt to serialize the JSON into.
 deserialize(String json, {Type outputType}) {
-  var deserialized = deseriaizeJson(json, outputType: outputType);
+  var deserialized = deserializeJson(json, outputType: outputType);
   logger.info("Deserialization result: $deserialized");
   return deserialized;
 }
 
 /// Deserializes JSON into data, without validating it.
-deseriaizeJson(String s, {Type outputType}) {
+deserializeJson(String s, {Type outputType}) {
   logger.info("Deserializing the following JSON: $s");
 
   if (outputType == null) {
