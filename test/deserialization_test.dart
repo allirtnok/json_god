@@ -33,8 +33,8 @@ testDeserializationOfMaps() {
       '{"hello":"world", "one": 1, "class": {"hello": "world"}}';
   String nestedJson =
       '{"foo": {"bar": "baz", "funny": {"how": "life", "seems": 2, "hate": "us sometimes"}}}';
-  Map simple = god.deserialize(simpleJson);
-  Map nested = god.deserialize(nestedJson);
+  var simple = god.deserialize(simpleJson ) as Map;
+  var nested = god.deserialize(nestedJson) as Map;
 
   expect(simple['hello'], equals('world'));
   expect(simple['one'], equals(1));
@@ -99,7 +99,7 @@ testDeserializationWithSchemaValidation() async {
   String babelRcJson =
       '{"presets":["es2015","stage-0"],"plugins":["add-module-exports"]}';
 
-  BabelRc deserialized = god.deserialize(babelRcJson, outputType: BabelRc);
+  var deserialized = god.deserialize(babelRcJson, outputType: BabelRc) as BabelRc;
 
   print(deserialized.presets.runtimeType);
   expect(deserialized.presets is List, equals(true));

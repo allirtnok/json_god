@@ -9,7 +9,7 @@ const Symbol runtimeTypeSymbol = #runtimeType;
 typedef Serializer(value);
 typedef Deserializer(value, {Type outputType});
 
-List<Symbol> _findGetters(ClassMirror classMirror, bool debug) {
+List<Symbol> _findGetters(ClassMirror classMirror) {
   List<Symbol> result = [];
 
   classMirror.instanceMembers
@@ -17,7 +17,7 @@ List<Symbol> _findGetters(ClassMirror classMirror, bool debug) {
     if (methodMirror.isGetter &&
         symbol != hashCodeSymbol &&
         symbol != runtimeTypeSymbol) {
-      if (debug) logger.info("Found getter on instance: $symbol");
+      logger.info("Found getter on instance: $symbol");
       result.add(symbol);
     }
   });
@@ -41,7 +41,7 @@ serialize(value, Serializer serializer, [@deprecated bool debug = false]) {
     }
   }
 
-  for (Symbol symbol in _findGetters(classMirror, debug)) {
+  for (Symbol symbol in _findGetters(classMirror)) {
     String name = MirrorSystem.getName(symbol);
     var valueForSymbol = instanceMirror.getField(symbol).reflectee;
 
@@ -143,7 +143,7 @@ _deserializeFromJsonByReflection(
           reflectType(Map, typeArguments.map((t) => t.reflectedType).toList())
               as ClassMirror;
       logger.info('Casting this map $data to Map of [$typeArguments]');
-      var output = mapType.newInstance(Symbol.empty, []).reflectee;
+      var output = mapType.newInstance(new Symbol(''), []).reflectee;
 
       for (var key in data.keys) {
         output[key] = data[key];
@@ -168,10 +168,8 @@ _deserializeFromJsonByReflection(
         Type requiredType = classMirror
             .instanceMembers[symbolForGetter].returnType.reflectedType;
         if (data[key].runtimeType != requiredType) {
-          if (debug) {
-            logger.info("Currently, $key is a ${data[key].runtimeType}.");
-            logger.info("However, $key must be a $requiredType.");
-          }
+          logger.info("Currently, $key is a ${data[key].runtimeType}.");
+          logger.info("However, $key must be a $requiredType.");
 
           deserializedValue =
               deserializer(deserializedValue, outputType: requiredType);

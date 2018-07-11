@@ -36,14 +36,14 @@ testSerializationOfDates() {
 
   print(s);
 
-  Map deserialized = json.decode(s);
+  var deserialized = json.decode(s);
   expect(deserialized['date'], equals(date.toIso8601String()));
 }
 
 testSerializationOfMaps() {
-  Map simple = json.decode(god.serialize(
+  var simple = json.decode(god.serialize(
       {'hello': 'world', 'one': 1, 'class': new SampleClass('world')}));
-  Map nested = json.decode(god.serialize({
+  var nested = json.decode(god.serialize({
     'foo': {
       'bar': 'baz',
       'funny': {'how': 'life', 'seems': 2, 'hate': 'us sometimes'}
@@ -70,7 +70,7 @@ testSerializationOfLists() {
   String s = god.serialize(pandorasBox);
   print(s);
 
-  List deserialized = json.decode(s);
+  var deserialized = json.decode(s);
 
   expect(deserialized is List, equals(true));
   expect(deserialized.length, equals(4));
@@ -98,7 +98,7 @@ testSerializationViaReflection() {
   String s = god.serialize(sample);
   print(s);
 
-  Map deserialized = json.decode(s);
+  var deserialized = json.decode(s);
   expect(deserialized['hello'], equals('world'));
   expect(deserialized['nested'] is List, equals(true));
   expect(deserialized['nested'].length == 3, equals(true));
@@ -114,7 +114,7 @@ testSerializationWithSchemaValidation() async {
   String s = god.serialize(babelRc);
   print(s);
 
-  Map deserialized = json.decode(s);
+  var deserialized = json.decode(s);
 
   expect(deserialized['presets'] is List, equals(true));
   expect(deserialized['presets'].length, equals(2));

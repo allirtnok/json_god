@@ -6,7 +6,7 @@ main() {
   god.logger.onRecord.listen(printRecord);
 
   test('fromJson', () {
-    Foo foo = god.deserialize('{"bar":"baz"}', outputType: Foo);
+    var foo = god.deserialize('{"bar":"baz"}', outputType: Foo) as Foo;
 
     expect(foo is Foo, true);
     expect(foo.text, equals('baz'));

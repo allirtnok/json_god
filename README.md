@@ -1,6 +1,6 @@
 # JSON God v2
 
-![Pub](https://img.shields.io/pub/v/json_god.svg)
+[![Pub](https://img.shields.io/pub/v/json_god.svg)](https://pub.dartlang.org/packages/json_god)
 [![build status](https://travis-ci.org/thosakwe/json_god.svg)](https://travis-ci.org/thosakwe/json_god)
 
 The ***new and improved*** definitive solution for JSON in Dart.

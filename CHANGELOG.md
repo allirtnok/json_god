@@ -1,5 +1,6 @@
-# 2.0.0
+# 2.0.0-beta+3
 * Long-needed updates, ensured Dart 2 compatibility, fixed DDC breakages.
+* Patches for reflection bugs with typing.
 
 # 2.0.0-beta+2
 * This version breaks in certain Dart versions (likely anything *after* `2.0.0-dev.59.0`)
